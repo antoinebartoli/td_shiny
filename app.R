@@ -16,7 +16,7 @@ consos <- readRDS('data/consos_clean.RDS')
 
 # Define UI for application that draws a histogram
 ui <- navbarPage(
-  'Analyses des consommations electriques',
+  'Shiny de Anne',
   
   tabPanel('Mon département',
            id = 'departements',
