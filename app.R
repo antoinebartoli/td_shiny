@@ -38,7 +38,7 @@ ui <- navbarPage(
     ###TODO
     
     mainPanel(
-      ##affichage du nom du departement
+      ##affichage du nom du departement kk,k
       h3(textOutput('nom_dep')),
       
       ####TODO: remplacer par la table par un datatable 
