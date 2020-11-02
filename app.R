@@ -1,6 +1,7 @@
 # libraries
 library(shiny)
 library(dplyr)
+library(DT)
 
 
 # Preparation des données -------------------------------------------------
@@ -43,8 +44,7 @@ ui <- navbarPage(
       ##affichage du nom du departement
       h3(textOutput('nom_dep')),
       
-      ####TODO: remplacer par la table par un datatable 
-      tableOutput('ma_table')
+      dataTableOutput('ma_table')
       
     )
     
@@ -89,7 +89,7 @@ server <- function(input, output) {
   ##Creation de la table a afficher
   ##TODO : remplacer par un datatable (dans server et ui)
   ##TODO: prendre toute la table et pas les six premieres lignes 
-   output$ma_table <- renderTable({
+   output$ma_table <- renderDataTable({
    out <-  filtre() %>%
      select(- contains('superficie'),
             - contains('residences'),
