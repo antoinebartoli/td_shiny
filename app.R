@@ -70,8 +70,8 @@ ui <- navbarPage(
 server <- function(input, output) {
   
   output$nom_dep <- renderText({
-    ##TODO: modifier pour afficher le nom du departement!!!!
-    'ANALYSE DU DEPARTEMENT TODO'
+    'ANALYSE DU DEPARTEMENT'
+    input$dep
   })
   
   # Cette fonction filtre le jeu de données entier
