@@ -76,9 +76,7 @@ ui <- navbarPage(
 # Define server logic required to draw a histogram
 server <- function(input, output) {
   
-  output$nom_dep <- renderText({
-    paste('ANALYSE DU DEPARTEMENT', input$dep)
-  })
+  output$nom_dep <- renderText({input$dep})
   
   # Cette fonction filtre le jeu de données entier
   # pour ne garder que ce qui est intéressant
