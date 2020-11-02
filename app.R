@@ -50,14 +50,13 @@ ui <- dashboardPage(
     
   )
   
-  ) ###fin du premier onglet
-  
-  
-  #####TODO: rajouter les onglets suivants :
-  #####Analyse des determinants de la conso
-  #####Cartographie
-  
-)
+) ###fin du premier onglet
+
+
+#####TODO: rajouter les onglets suivants :
+#####Analyse des determinants de la conso
+#####Cartographie
+
 
 
 
@@ -72,9 +71,8 @@ server <- function(input, output) {
   # Cette fonction filtre le jeu de données entier
   # pour ne garder que ce qui est intéressant
   
-
+  
   filtre <- reactive({
-    ##TODO: rajouter aussi un filtre sur les annees
     consos %>% 
       filter(nom_departement == input$dep) %>% 
       filter(annee %in% input$annee)
