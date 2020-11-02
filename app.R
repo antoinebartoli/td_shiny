@@ -36,7 +36,8 @@ ui <- navbarPage(
       selectInput("annee",
                   "Choisissez l'annee:",
                   choices = consos$annee %>% unique() %>% sort,
-                  selected = 2011)
+                  selected = 2011,
+                  multiple = TRUE)
     ),
     
     
@@ -83,7 +84,7 @@ server <- function(input, output) {
     ##TODO: rajouter aussi un filtre sur les annees
     consos %>% 
       filter(nom_departement == input$dep) %>% 
-      filter(annee == input$annee)
+      filter(annee %in% input$annee)
   })
   
   ##Creation de la table a afficher
