@@ -34,7 +34,7 @@ ui <- navbarPage(
                   selected = 'Doubs')
     ),
     
-    # Choix de l'année 
+    # Choix de l'année ou d'autre chose
     ###TODO
     
     mainPanel(
