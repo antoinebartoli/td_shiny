@@ -4,6 +4,7 @@ library(dplyr)
 library(shinydashboard)
 library(DT)
 library(tidyverse)
+library(plotly)
 
 
 # Preparation des données -------------------------------------------------
@@ -15,16 +16,20 @@ names(consos)
 
 ui <- dashboardPage(
   
+  # Titre du dashboard
   dashboardHeader(
     title="Analyses des consommations electriques"
   ),
   
+  # Barre de paramètre à gauche dans le dashboard
   dashboardSidebar(
+    
     # Choix du département 
     selectInput("dep",
                 "Choisissez votre departement:",
                 choices = levels(consos$nom_departement),
                 selected = 'Doubs'),
+    
     # Choix de l'année 
     selectInput("annee",
                 "Choisissez votre année:",
@@ -33,12 +38,14 @@ ui <- dashboardPage(
                 selected = '2015')
   ),
   
+  # Le corp du dashboard : Table + histogramme
   dashboardBody(
     h5(textOutput('nom_dep')
        , dataTableOutput('ma_table',width = "40%"))
     
     
     , plotOutput('repartition')
+    , plotOutput('evolution')
   )
 ) 
 
@@ -57,6 +64,7 @@ server <- function(input, output) {
   
   output$ma_table <- renderDataTable({
     out <-  filtre() %>%
+      
       select(annee,  conso_totale_residentiel_mwh_,
              conso_totale_professionnel_mwh_,
              conso_totale_agriculture_mwh_,
@@ -82,7 +90,19 @@ server <- function(input, output) {
       geom_bar(stat = 'identity') +
       aes(y  = value, x = annee, fill = name)
     
-  }) 
+  })
+  
+  output$evolution <- renderPlot({
+    df <- filter() %>%
+      tidyr::pivot_longer(-c("annee"))
+    
+    fig <- ggplot(df) +
+      aes(y=value, x=annee, color=name) +
+      geom_line()
+      
+  })
+  
+  
 }
 
 
