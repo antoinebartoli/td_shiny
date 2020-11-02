@@ -8,7 +8,6 @@ library(dplyr)
 consos <- readRDS('data/consos_clean.RDS')
 
 ##Consos mailles régionales pour l onglet regions
-#test
 
 
 # ui ----------------------------------------------------------------------
@@ -27,15 +26,16 @@ ui <- navbarPage(
     sidebarPanel(
       
       # Choix du département 
-      # TODO: choix parmi toutes les possibilités
       selectInput("dep",
                   "Choisissez votre departement:",
-                  choices = c('Doubs','Nord','Paris'),
-                  selected = 'Doubs')
+                  choices = consos$nom_departement %>% unique() %>% sort,
+                  selected = 'Doubs'),
+      #Choix de l'année
+      selectInput("annee",
+                  "Choisissez l'annee:",
+                  choices = consos$annee %>% unique() %>% sort,
+                  selected = 2017)
     ),
-    
-    # Choix de l'année 
-    ###TODO
     
     mainPanel(
       ##affichage du nom du departement
@@ -45,8 +45,6 @@ ui <- navbarPage(
       tableOutput('ma_table')
       
     )
-    
-    ##TODO : répartition des consos par secteur et année
     
     ##TODO: évolution des consos par secteur au cours du temps
     
@@ -70,8 +68,7 @@ ui <- navbarPage(
 server <- function(input, output) {
   
   output$nom_dep <- renderText({
-    ##TODO: modifier pour afficher le nom du departement!!!!
-    'ANALYSE DU DEPARTEMENT TODO'
+    paste('ANALYSE DU DEPARTEMENT', input$dep)
   })
   
   # Cette fonction filtre le jeu de données entier
@@ -79,9 +76,9 @@ server <- function(input, output) {
   
 
   filtre <- reactive({
-    ##TODO: rajouter aussi un filtre sur les annees
     consos %>% 
-      filter(nom_departement == input$dep)
+      filter(nom_departement == input$dep) %>%
+      filter(annee == input$annee)
   })
   
   ##Creation de la table a afficher
