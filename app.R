@@ -9,15 +9,10 @@ library(tidyverse)
 # Preparation des données -------------------------------------------------
 
 consos <- readRDS('data/consos_clean.RDS')
-
-##Consos mailles régionales pour l onglet regions
-
-
+names(consos)
 
 # ui ----------------------------------------------------------------------
 
-
-# Define UI for application that draws a histogram
 ui <- dashboardPage(
   
   dashboardHeader(
@@ -45,42 +40,21 @@ ui <- dashboardPage(
     
     , plotOutput('repartition')
   )
-  ##TODO : répartition des consos par secteur et année
-  ##TODO: évolution des consos par secteur au cours du temps
 ) 
-
-
-
-
-#####TODO: rajouter les onglets suivants :
-#####Analyse des determinants de la conso
-#####Cartographie
-
-
 
 
 # Server ------------------------------------------------------------------
 
-
-# Define server logic required to draw a histogram
 server <- function(input, output) {
   
   output$nom_dep <- renderText({input$dep})
   
-  # Cette fonction filtre le jeu de données entier
-  # pour ne garder que ce qui est intéressant
-  
-  
   filtre <- reactive({
-    ##TODO: rajouter aussi un filtre sur les annees
     consos %>% 
-      filter(nom_departement == input$dep) %>%
-      filter(annee %in% input$annee)
+    filter(nom_departement == input$dep) %>%
+    filter(annee %in% input$annee)
   })
   
-  ##Creation de la table a afficher
-  ##TODO : remplacer par un datatable (dans server et ui)
-  ##TODO: prendre toute la table et pas les six premieres lignes 
   output$ma_table <- renderDataTable({
     out <-  filtre() %>%
       select(annee,  conso_totale_residentiel_mwh_,
