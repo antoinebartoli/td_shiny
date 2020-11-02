@@ -18,44 +18,33 @@ consos <- readRDS('data/consos_clean.RDS')
 
 
 # Define UI for application that draws a histogram
-ui <- navbarPage(
-  'Analyses des consommations electriques',
-  
-  tabPanel('Mon département',
-           id = 'departements',
-  
-
-
-  sidebarLayout(
-    sidebarPanel(
-      
-      # Choix du département 
-      selectInput("dep",
-                  "Choisissez votre departement:",
-                  choices = consos$nom_departement %>% unique() %>% sort,
-                  selected = 'Doubs'),
-      # Choix de l'année
-      selectInput("annee",
-                  "Choisissez l'annee:",
-                  choices = consos$annee %>% unique() %>% sort,
-                  selected = 2011,
-                  multiple = TRUE)
+ui <- dashboardPage(
+  dashboardHeader(
+    title = "Analyses des consommations electriques"
     ),
+  
+  dashboardSidebar(
+    # Choix du département 
+    selectInput("dep",
+                "Choisissez votre departement:",
+                choices = consos$nom_departement %>% unique() %>% sort,
+                selected = 'Doubs'),
+    # Choix de l'année
+    selectInput("annee",
+                "Choisissez l'annee:",
+                choices = consos$annee %>% unique() %>% sort,
+                selected = 2011,
+                multiple = TRUE)
+  ),
+  
+  
+  dashboardBody(
+    h5(textOutput('nom_dep'),
+       dataTableOutput('ma_table', width = "40%")),
     
+    # barplots des repartitions par secteur et par an   
+    plotOutput('repartition'),
     
-    mainPanel(
-      ##affichage du nom du departement
-      h3(textOutput('nom_dep')),
-      
-      dataTableOutput('ma_table'),
-      
-      plotOutput('repartition')
-      
-    )
-    
-    ##TODO : répartition des consos par secteur et année
-    
-    ##TODO: évolution des consos par secteur au cours du temps
     
   )
   
