@@ -24,16 +24,19 @@ ui <- dashboardPage(
     ),
   
   dashboardSidebar(
-    # Choix du département 
-    selectInput("dep",
-                "Choisissez votre departement:",
-                choices = consos$nom_departement %>% unique() %>% sort,
-                selected = 'Doubs'),
+    # # Choix de la région
+    selectInput("region",
+                "Choisissez votre region:",
+                choices = consos$nom_region %>% unique() %>% sort(),
+                selected = 'Bretagne'),
+    
+    # ui conditionnelle
+    uiOutput('ui_departement'),
     # Choix de l'année
     selectInput("annee",
                 "Choisissez l'annee:",
-                choices = consos$annee %>% unique() %>% sort,
-                selected = 2011,
+                choices = consos$annee %>% unique() %>% sort(),
+                selected = consos$anne %>% unique() %>% sort(),
                 multiple = TRUE)
   ),
   
@@ -46,7 +49,10 @@ ui <- dashboardPage(
     plotOutput('repartition'),
     
     # courbes des evolutions des differents secteurs
-    plotOutput('evolution')
+    plotOutput('evolution'),
+    
+    # le boxplot des consos moyennes des departements de la region
+    plotOutput('boxplot_conso_moyenne')
     
   )
   
@@ -68,15 +74,29 @@ server <- function(input, output) {
   
   output$nom_dep <- renderText({input$dep})
   
-  # Cette fonction filtre le jeu de données entier
-  # pour ne garder que ce qui est intéressant
+  # Ui interactive de departement qui choisit parmi la region
   
+  output$ui_departement <- renderUI({
+    
+    # selectionner les bons departements
+    choix_possibles <- consos %>% 
+      filter(nom_region == input$region) %>% 
+      pull(nom_departement) %>% 
+      unique()
+    
+    selectInput("dep",
+                "Choisissez votre departement:",
+                choices = choix_possibles,
+                selected = choix_possibles[1])
+    
+  })
   
   filtre <- reactive({
     out <- consos %>% 
       filter(nom_departement == input$dep) %>% 
       filter(annee %in% input$annee)
     
+    # ne garder que les colonnes qui nous interessent
     out <- out %>% 
       select(annee,
              conso_totale_residentiel_mwh_,
@@ -88,12 +108,32 @@ server <- function(input, output) {
     out
   })
   
+  get_departement_region <- reactive({
+    
+    # recuperer la region
+    region <- consos %>% 
+      filter(nom_departement == input$dep) %>% 
+      filter(annee %in% input$annee) %>% 
+      distinct(annee, nom_region)
+    
+    consos_region <- consos %>% 
+      inner_join(region, by = c('annee', "nom_region"))
+    
+    # selectionner seulement l'annee, le dep et les consos moyennes
+    consos_region <- consos_region %>% 
+      select(annee, nom_departement, contains('conso_moyenne'))
+    
+    print(head(consos_region))
+    consos_region
+  })
+  
   ##Creation de la table a afficher
   ##TODO: prendre toute la table et pas les six premieres lignes 
   output$ma_table <- renderDataTable({
     out <- filtre() %>%
       mutate_all(list(round)) %>% 
-      rename_all(list(str_replace), pattern = 'conso_totale', replacement = '')
+      rename_all(list(str_replace), pattern = 'conso_totale_', replacement = '')
+    # print(out)
     out
   })
   
@@ -119,6 +159,24 @@ server <- function(input, output) {
       theme(legend.position = 'bottom')
     
     fig
+  })
+  
+  # boxplot des consos moyennes
+  output$boxplot_conso_moyenne <- renderPlot({
+    df <- get_departement_region() %>% 
+      tidyr::pivot_longer(-c("annee", "nom_departement")) %>% 
+      mutate(annee = as.character(annee),
+             name = str_replace(name, pattern = 'conso_moyenne_', rep = '') %>% 
+               str_replace(pattern = 'mwh_', rep = ''))
+    
+    ggplot(df) +
+      geom_boxplot() +
+      facet_wrap(~ name, scales = 'free') +
+      aes(y = value, x = annee, fill = annee) +
+      theme(legend.position = 'bottom') +
+      ggtitle('Le titre') +
+      ylab('les ordonnees') +
+      xlab('les abscisses')
   })
   
 }
