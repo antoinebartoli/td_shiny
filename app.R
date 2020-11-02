@@ -73,33 +73,33 @@ server <- function(input, output) {
   
   
   filtre <- reactive({
-    consos %>% 
+    out <- consos %>% 
       filter(nom_departement == input$dep) %>% 
       filter(annee %in% input$annee)
-  })
-  
-  ##Creation de la table a afficher
-  ##TODO : remplacer par un datatable (dans server et ui)
-  ##TODO: prendre toute la table et pas les six premieres lignes 
-   output$ma_table <- renderDataTable({
-   out <-  filtre() %>%
-     select(- contains('superficie'),
-            - contains('residences'),
-            - contains('taux')
-            ,- contains('geos')) %>% 
-     select(contains('conso'))
-   print(out)
-   out
-  } )
-   
-  output$repartition <- renderPlot({
-    df_filtre <- filtre() %>% 
+    
+    out <- out %>% 
       select(annee,
              conso_totale_residentiel_mwh_,
              conso_totale_professionnel_mwh_,
              conso_totale_agriculture_mwh_,
              conso_totale_tertiaire_mwh_,
-             conso_totale_autres_mwh_) %>% 
+             conso_totale_autres_mwh_)
+    
+    out
+  })
+  
+  ##Creation de la table a afficher
+  ##TODO: prendre toute la table et pas les six premieres lignes 
+  output$ma_table <- renderDataTable({
+    out <- filtre() %>%
+      mutate_all(list(round)) %>% 
+      rename_all(list(str_replace), pattern = 'conso_totale', replacement = '')
+    out
+  })
+  
+  # barplots par annee, couleurs par secteur d'activite
+  output$repartition <- renderPlot({
+    df_filtre <- filtre() %>%
       pivot_longer(-c("annee"))
     
     ggplot(df_filtre) +
