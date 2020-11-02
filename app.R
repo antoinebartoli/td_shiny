@@ -9,7 +9,7 @@ consos <- readRDS('data/consos_clean.RDS')
 
 ##Consos mailles régionales pour l onglet regions
 
-
+d
 
 # ui ----------------------------------------------------------------------
 
