@@ -45,6 +45,8 @@ ui <- dashboardPage(
     # barplots des repartitions par secteur et par an   
     plotOutput('repartition'),
     
+    # courbes des evolutions des differents secteurs
+    plotOutput('evolution')
     
   )
   
@@ -105,6 +107,20 @@ server <- function(input, output) {
     ggplot(df_filtre) +
       geom_bar(stat = 'identity') +
       aes(y = value, x = annee, fill = name)
+  })
+  
+  # graphique des courbes
+  output$evolution <- renderPlot({
+    df <- filtre() %>% 
+      tidyr::pivot_longer(-c("annee"))
+    
+    fig <- ggplot(df) +
+      aes(y = value, x = annee, color = name) +
+      geom_line() +
+      theme_bw() +
+      theme(legend.position = 'bottom')
+    
+    fig
   })
   
 }
