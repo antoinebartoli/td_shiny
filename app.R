@@ -27,10 +27,9 @@ ui <- navbarPage(
     sidebarPanel(
       
       # Choix du département 
-      # TODO: choix parmi toutes les possibilités
       selectInput("dep",
                   "Choisissez votre departement:",
-                  choices = c('Doubs','Nord','Paris'),
+                  choices = consos$nom_departement %>% unique() %>% sort,
                   selected = 'Doubs')
     ),
     
