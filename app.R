@@ -30,11 +30,14 @@ ui <- navbarPage(
       selectInput("dep",
                   "Choisissez votre departement:",
                   choices = consos$nom_departement %>% unique() %>% sort,
-                  selected = 'Doubs')
+                  selected = 'Doubs'),
+      # Choix de l'année
+      selectInput("annee",
+                  "Choisissez l'annee:",
+                  choices = consos$annee %>% unique() %>% sort,
+                  selected = 2011)
     ),
     
-    # Choix de l'année 
-    ###TODO
     
     mainPanel(
       ##affichage du nom du departement
@@ -79,7 +82,8 @@ server <- function(input, output) {
   filtre <- reactive({
     ##TODO: rajouter aussi un filtre sur les annees
     consos %>% 
-      filter(nom_departement == input$dep)
+      filter(nom_departement == input$dep) %>% 
+      filter(annee == input$annee)
   })
   
   ##Creation de la table a afficher
